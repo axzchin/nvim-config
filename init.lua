@@ -85,6 +85,11 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
 -- ============================================================
+-- USER CONFIGURATION – Change these for new machines
+-- ============================================================
+local VAULT_PATH = os.getenv("OBSIDIAN_VAULT") or "~/Documents/Obsidian/Vault"
+
+-- ============================================================
 -- SECTION 1: OPTIONS
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
 -- ============================================================
@@ -97,6 +102,7 @@ do
   --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
+  vim.o.conceallevel = 2
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
   vim.g.have_nerd_font = false
@@ -110,7 +116,7 @@ do
   vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -447,7 +453,63 @@ do
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
+  -- ============================================================
+  -- Obsidian.nvim – note‑taking for Obsidian vaults
+  -- ============================================================
+  vim.pack.add { gh 'obsidian-nvim/obsidian.nvim' }
+
+  -- Optional: plenary.nvim is already installed via Telescope,
+  -- so we don't need to add it again.
+
+  require('obsidian').setup {
+  legacy_commands = false,
+
+  workspaces = {
+    {
+      name = "personal",
+      path = VAULT_PATH
+    },
+  },
+
+  daily_notes = {
+    folder = "/",
+    date_format = "%Y-%m-%d",
+    template = "Daily Note Template",   -- must match a template filename without .md
+    workdays_only = false,
+  },
+
+  templates = {
+    folder = "Templates",
+    date_format = "%Y-%m-%d",
+    time_format = "%H:%M",
+    substitutions = {},   -- ← required! (even if empty)
+  },
+
+  ui = {
+    enable = true,
+    conceallevel = 2,
+  },
+
+  note_id_func = function(title)
+    return title
+  end,
+}
+
+-- [[ Keymaps for Obsidian ]]
+-- Add these after the `which-key` configuration for discoverability.
+local obsidian_map = function(keys, cmd, desc)
+  vim.keymap.set('n', keys, '<cmd>' .. cmd .. '<CR>', { desc = 'Obsidian: ' .. desc })
 end
+
+obsidian_map('<leader>on', 'Obsidian new', 'New note')
+obsidian_map('<leader>of', 'Obsidian quick_switch', 'Quick switch')
+obsidian_map('<leader>os', 'Obsidian search', 'Search notes')
+obsidian_map('<leader>od', 'Obsidian today', 'Open today\'s daily note')
+-- Add more as you like (e.g., <leader>ob for backlinks)
+end
+
+vim.pack.add { "https://github.com/bullets-vim/bullets.vim" }
+vim.g.bullets_enabled_file_types = { 'markdown', 'text' }
 
 -- ============================================================
 -- SECTION 5: SEARCH & NAVIGATION
@@ -967,10 +1029,10 @@ do
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug'
-  -- require 'kickstart.plugins.indent_line'
+  require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
-  -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
+  require 'kickstart.plugins.autopairs'
+  require 'kickstart.plugins.neo-tree'
   -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`

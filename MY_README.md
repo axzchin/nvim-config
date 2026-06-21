@@ -100,15 +100,3 @@ This config is built on the excellent work of:
 ## 📝 License
 
 Same as Kickstart – use at your own risk, feel free to copy and modify.
-```
-
----
-
-Save this as `README.md` in the root of your repository, then add, commit, and push it.
-
-```bash
-git add README.md
-git commit -m "Add README with upstream instructions"
-git push origin master
-```
-
